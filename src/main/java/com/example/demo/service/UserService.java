@@ -6,10 +6,11 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.User;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+
+import java.util.*;
+
+import com.example.demo.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,63 +19,34 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserService {
-    
-    private List<User> userList = new ArrayList();
+
+    @Autowired
+    private UserRepository userRepository;
+
 
     public User save(User user) {
-        
-        var userId = new Random().nextInt(10000);
-        
-        user.setId(userId);
-        
-        userList.add(user);
-        
-        return user;
-        
+
+        return userRepository.save(user);
+
     }
 
     public boolean delete(long id) {
+
+        userRepository.deleteById(id);
         
-        boolean success = userList.removeIf(user -> user.getId() == id);
-        
-        return success;
+        return true;
     }
 
     public User update(User user) {
-        
-        User userFound = getUserById(user.getId());
-     
-        if(Objects.nonNull(userFound)) {
-            
-            userFound.setName(user.getName());
-            userFound.setAge(user.getAge());
-            
-        }
-        
-        return user;
-        
+        return  userRepository.save(user);
     }
 
     public User getUser(long id) {
-      
-        final User userFound = getUserById(id);
-        
-        return userFound;
+
+        final Optional<User> optUser = userRepository.findById(id);
+
+        // operacao ternaria
+        return optUser.isPresent() ? optUser.get() : new User();
     }
-    
-    private User getUserById(long id) {
-        
-        User userFound = null;
-        
-        for(User u : userList) {
-            
-            if(id == u.getId()) {
-                userFound = u;
-                break;
-            }            
-        }
-        
-        return userFound;
-    }
-    
+
 }
